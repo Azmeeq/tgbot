@@ -69,8 +69,13 @@ def webhook():
         # Создаём Update объект
         update = types.Update(**update_dict)
         
-        # Обрабатываем в новом event loop
-        asyncio.run(dp.feed_update(bot, update))
+        # ✅ ИСПРАВЛЕНО: Используем новый event loop правильно
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(dp.feed_update(bot, update))
+        finally:
+            loop.close()
         
         return 'OK', 200
         
